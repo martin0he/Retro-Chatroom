@@ -6,7 +6,7 @@ import java.util.*;
 public class ChatroomServer {
     private static final int PORT = 12345;
     private static Set<ClientHandler> clientHandlers = new HashSet<>();
-    private static List<String> activeUsers = new ArrayList<>(); // List to hold active users
+    private static List<String> activeUsers = new ArrayList<>();
 
     public static void main(String[] args) {
         System.out.println("Chat server started...");
@@ -37,15 +37,14 @@ public class ChatroomServer {
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
 
-                // Request and handle username
                 username = in.readLine();
 
                 synchronized (activeUsers) {
-                    activeUsers.add(username); // Add user to the active users list
-                    broadcastActiveUsers(); // Broadcast the updated list of active users
+                    activeUsers.add(username); // add user to the active users list
+                    broadcastActiveUsers(); // broadcast the updated list of active users
                 }
 
-                // Broadcast the user's joining message with timestamp
+                // display the user's joining message with timestamp
                 String joinMessage = String.format("%s joined the chat at %s",
                         username, new SimpleDateFormat("HH:mm:ss").format(new Date()));
                 System.out.println(joinMessage);
@@ -53,7 +52,7 @@ public class ChatroomServer {
 
                 String message;
                 while ((message = in.readLine()) != null) {
-                    // Handle typing status
+                    // handle typing status
                     if (message.equals("/typing")) {
                         broadcastTypingStatus("/typing " + username);
                     } else if (message.equals("/stoptyping")) {
@@ -77,8 +76,8 @@ public class ChatroomServer {
                 }
 
                 synchronized (activeUsers) {
-                    activeUsers.remove(username); // Remove user from the active users list
-                    broadcastActiveUsers(); // Broadcast the updated list of active users
+                    activeUsers.remove(username); // remove user from the active users list
+                    broadcastActiveUsers(); // broadcast the updated list of active users
                 }
 
                 clientHandlers.remove(this);
